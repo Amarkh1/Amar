@@ -1,0 +1,671 @@
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    filters,
+    ContextTypes,
+    ConversationHandler,
+)
+import speech_recognition as sr
+import os
+import subprocess
+import re
+from fuzzywuzzy import fuzz
+import json
+from datetime import datetime
+
+```python name=main.py
+from telegram import Update, InlineKeyboardButton,
+import logging
+import random
+import traceback
+from telegram import __version__ as TG InlineKeyboardMarkup
+from telegram.ext import_VER
+from keep_alive import keep_alive
+
+# Set up logging
+logging. (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    filters,
+    ContextTypes,
+    ConversationHandler,basicConfig(
+    format='%(asctime
+)
+import speech_recognition as sr
+import os)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger
+import subprocess
+import re
+from fuzzywuzzy import fuzz
+import json
+from datetime import datetime = logging.getLogger(__name__)
+
+#
+import logging
+import random
+import traceback
+from telegram Initialize the text-to import __version__ as TG_VER
+from keep_alive import keep_alive-speech engine with error handling
+engine = None
+try:
+    import pyttsx3
+    engine = pyttsx3.init()
+    logger.info("TTS engine initialized successfully")
+except Exception as e:
+    logger.warning(f"TTS initialization
+
+# Set up logging
+logging.basicConfig(
+    format='%(asctime)s - failed: {e}. TTS features will be disabled.")
+
+# Set FFmpeg path for %(name)s - %(levelname)s - %( Replit
+FFMPEG_PATH =message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__) "/usr/bin/ffmpeg" if os.path.exists("/usr/bin/ffmpeg") else "ffmpeg"
+
+# Function to convert .ogg to .wav
+def convert_ogg_to_wav(input
+
+# Initialize the text-to-speech engine with error handling
+engine = None_file, output_file):
+    input_file = os.
+try:
+    import pyttsx3
+    engine = pyttsx3.init()
+    logger.info("TTS engine initialized successfullypath.abspath(input_file)
+    output_file = os.path.abspath(output_file)
+    command = [FFMPEG_PATH, '-y', '-i', input_file, output_file]
+    try:
+        subprocess.run(command, check=")
+except Exception as e:
+    logger.warningTrue, capture_output=True)
+        return True
+    except subprocess.CalledProcessError as e:(f"T
+        logger.error(f"FFmpeg error: {e}")TS initialization failed: {e}. TTS features
+        return False
+    except FileNotFoundError:
+        logger.error(f"FFmpeg executable not found")
+        return False
+
+# Function to convert text to speech
+def text_to_speech( will be disabled.")
+
+# Set FFtext: str, output_file: str):
+    if engine is None:
+        loggermpeg path for Replit
+FFMPEG_PATH = "/usr/.warning("TTS engine not available")
+        return False
+    try:
+        engine.save_to_bin/ffmpeg" if os.file(text, output_file)
+        engine.runAndWait()
+        return True
+    except Exception as e:
+        logger.error(f"TTS error: {e}")
+        return False
+
+# Function to normalize text
+def normalize_text(text: str) -> str:
+    text =path.exists("/usr/bin/ffmpeg") else text.lower()
+    text = re.sub(r'[ "ffmpeg"
+
+# Function to convert .ogg to .wav
+def convert_ogg_to_wav(input_^\w\s]', '', text)
+    text = re.sub(r'\sfile, output_file):
+    input_file = os.path.abspath(input_file)
+    output_file = os.path.abspath(output_file)
+    command = [FFMPEG_PATH, '-y', '-i', input_file, output_file+', ' ', text)
+    return text.strip()
+
+# Function to check if the user's response matches the expected answer
+def is_response_correct(user_response: str]
+    try:
+        subprocess.run(comman, expected_answers: list) -> bool:
+    user_response = normalize_text(user_response)
+    
+    for expected, check=True, capture_output=True)d_answer in expected_answers:
+        expecte
+        return True
+    except subprocess.CalledProcessError as e:
+        logger.error(f"FFmpeg error: {d_answer = normalize_text(expected_answer)
+        
+        similarity_ratio = fuzz.ratio(user_response, expected_answer)
+        if similarity_ratio >= 75:
+            return True
+        
+        # Check if expected answer wordse}")
+        return False
+    except FileNotFoundError:
+        logger.error(f"FFmpeg executable not found") are contained in user response
+        expected_words = set(expected_answer.split())
+        user_words = set(user_response.split())
+        common
+        return False
+
+# Function to convert text to speech
+def text_to_speech(_words = expected_words.intersection(user_words)
+        
+        # If mosttext: str, output_file: of the expected words are in the user's response
+        if len(common str):
+    if engine is None:
+        logger.warning("TTS engine not available")
+        return False
+    try:
+        engine_words) >= len(expected_words) * 0.7:
+            return True.save_to_file(text, output_file)
+        engine.runAndWait()
+        return True
+    
+    
+    return False
+
+# Get token from environment variableexcept Exception as e:
+        logger
+TOKEN = os.getenv('.error(f"TTS error: {e}")
+        return False
+
+# Function to normalize text
+def normalize_text(TELEGRAM_TOKEN')
+
+if not TOKEN:
+    logger.error("TELEGRAM_TOKEN environment variable nottext: str) -> str:
+    text = text set!")
+    exit(1)
+else:
+    logger..lower()
+    text = reinfo("TELEGRAM_TOKEN found successfully.sub(r'[^\w")
+
+# Define conversation states for each exercise
+EXERCISE1, EXERCISE2, EXERCISE3, EXERCISE4, EXERCISE5, EXERCISE6, EXERCISE7, EXERCISE8, EXERCISE9, EXERCISE10 = range(10)\s]', '', text)
+
+# Define the worksheet content
+PAST_SIMPLE_WORKSHEET = {
+    "exercise1": {
+        "title": "Exercise 1: Days an
+    text = re.sub(r'\s+',d Months",
+        "instruction": "Complete the gaps with days of the week and months.",
+        "examples ' ', text)
+    return text.strip()": [
+            "Today is Sunday. Yesterday was Saturday.",
+            "This month is August. Last month was July."
+        ],
+        "questions": [
+            "Today is ______.",
+            "This
+
+# Function to check month is ______.",
+            "Yesterday if the user's was ______.",
+            "Last month was ______."
+        ],
+        "answers": [
+            ["monday", "tuesday", " response matches the expectewednesday", "thursday", "friday", "saturday", "sunday"],
+            ["january", "february", "d answer
+def is_response_correct(user_responsemarch", "april", "may", "june", "july", ": str, expected_answers: list) -> bool:
+    user_response = normalize_august", "september", "october", "novembertext(user_response)
+    ", "december"],
+            ["monday", "tuesday", "wednesday
+    for expecte", "thursday", "friday", "saturday", "sunday"],
+            d_answer in expected_answers:
+        expected_answer["january", "february", "march", " = normalize_text(expected_answer)
+        
+        similarity_ratio = fuzz.ratio(user_response, expected_april", "may", "june", "july", "august", "answer)
+        if similarity_ratio >= 75september", "october",:
+            return True
+        
+        # Check if expected answer words "november", "december"]
+        ]
+    },
+    "exercise2": {
+        "title": "Exercise 2: Matching Activity",
+        "instruction": "Match the people are contained in user response
+        expected_words = set(expected_answer (A-E) with the sentences (1-5).",
+        "pairs": {
+            "Person.split())
+        user_words = set(user_response.split())
+        common_words = expecte A": "1.I walked in the park and I played basketball.",
+            "Persond_words.intersection(user_words)
+        
+        # If most of the expecte B": "2.We cooked dinner and we cleaned the house.",
+            "Person C": "3.I travelled by train and I visited a friend.",
+            "Person D": "4.The baby cried so I called words are in the user's response
+        if len(common_words)d the doctor.",
+            "Person E": "5.We listened to music and we danced.",
+        },
+        "answers": {
+            "A": ["4"],
+            "B": >= len(expected_words) * 0.7:
+            return True
+    
+    return False
+
+# Get token from environment variable ["5"],
+            "C": ["3"],
+            "D": ["1"],
+            "
+TOKEN = os.getenv('TELEGRAM_TOKENE": ["2"]
+        }
+    }
+}
+
+# Navigation keyboard
+def get_navigation_keyboard(current_exercise):
+    buttons = []
+    if current_exercise >')
+
+if not TOKEN:
+    logger.error("TELEGRAM_TOKEN environment variable not 1:
+        buttons.append(InlineKeyboardButton("← Previous", callback_data=f"nav_{current_exercise-1}"))
+    if current_exercise < 10:
+        buttons.append(InlineKeyboardButton("Next →", callback_data=f"nav_{current_exercise+ set!")
+    exit(1)
+else:
+    1}"))
+    buttons.append(InlineKeyboardButton("logger.info("TELEGRAM_TOKEN founRestart", callback_data="nav_1"))
+    return InlineKeyboardMarkupd successfully")
+
+# Define conversation states for each exercise
+EXERCISE1, EXERCISE2,([buttons])
+
+# Start EXERCISE3, the worksheet
+async def start_worksheet(update: Update, context: ContextTypes.DEFAULT_TYPE): EXERCISE4, EXERCISE5, EXERCISE6, EXERCISE7, EXERCISE8, EXERCISE9,
+    logger.info(f"Start command received from {update.effective_user.id}")
+    context EXERCISE10 = range(10)
+
+# Define the worksheet content
+PAST_SIMPLE_WORKSHEET = {
+    "exercise1": {.user_data['current_exercise'] = 1
+    welcome_msg = (
+        "🎓 Welcome to the Past
+        "title": "Exercise 1: Days and Months", Simple Worksheet Bot! 🎓\
+        "instructionn\n"
+        "": "Complete the gaps with days of the week and monthsThis interactive bot will help you practice past simple tense through .",
+        "10 exercises.\n"
+        "You can type your answers or send voice messages! 🎤\n\n"
+        "Letexamples": [
+            "Today is Sunday. Yesterday was Saturday.",
+            "This month is August. Last month was July."
+        ],
+        "questions": [
+            "Today is ______.",
+            "This's start with Exercise 1..."
+    )
+    await update.message.reply_text(welcome_msg)
+    return await month is ______.",
+            "Yesterday was ______.", start_exercise(update, context, 1)
+
+# Enhanced exercise handler
+            "Last month was ______."
+        ],
+        "answers": [
+            ["monday", "tuesday", "wednesday", "thursday", " with voice support
+async def handle_exercise(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    exercise_number = context.user_friday", "saturday", "sunday"],
+            ["january", "february",data.get('current_exercise "march", "april", "may", "june",', 1)
+    
+    logger.info(f"Handling exercise {exercise_ "july", "august", "septembernumber} for user {update.effective", "october", "november", "december"],
+            ["monday", "tuesday", "wednesday", "_user.id}")
+    
+    # Handle voice messages
+    if update.message.voice:
+        try:
+            logger.info("thursday", "friday", "saturday",Processing voice message")
+            voice_file "sunday"],
+            ["january", "february", = await update.message.voice.get_file()
+            voice_path = f"voice_{update.message.from_user.id}.ogg"
+            wav_path = f" "march", "april", "mayvoice_{update.message", "june",.from_user.id}.wav"
+
+            await voice_file.download_to_drive(voice_path)
+            
+            if not convert_ogg_to_wav( "july", "august", "septembervoice_path, wav_path):
+                await update.message.reply_text("❌ Error", "october", converting audio file.")
+                return exercise_number
+
+            recogn "november", "december"]
+        ]
+    },
+    "exerciseizer = sr.Recognizer()
+            2": {
+        "title": "Exercise 2: Matching Activity",
+        "with sr.AudioFile(wav_path) as source:
+                audio = recognizer.record(source)
+                user_speech = recognizer.recognize_google(audio).lower()
+                awaitinstruction": "Match the people (A-E update.message.reply_text(f"🎙️ I heard: '{user_speech}'")
+                
+                # Process as text
+                update.message.text = user_speech
+                return await handle_exercise(update, context)
+
+        except sr.UnknownValue) with the sentences (1-5).",
+        "pairs": {
+            "PersonError:
+            await update.message.reply_text("❌ Sorry, I couldn't understand the audio.")
+            return A": "1.I walked in the park and I played basketball.",
+            "Person B": " exercise_number
+        except Exception as e:
+            logger.error(f"Voice processing error: {e}")
+            await update2.We cooked dinner an.message.reply_text("❌ Error processing voice message.")
+            return exercise_numberd we cleaned the house.",
+            "Person C": "3.I
+        finally:
+            for path in [voice_path, wav_path]:
+                try:
+                    if travelled by train and I visited a 'path' in locals() friend.",
+            "Person D": "4.The baby cried so I calle and os.path.exists(path):d the doctor.",
+            "Person E
+                        os.remove(path)
+                except:
+                    pass
+
+    # Handle text messages
+    elif update.message.text:
+        user": "5.We listened to music and we_input = update.message.text.strip().lower()
+        logger.info(f"Processing text: {user_input}")
+        
+        if exercise_number == 1:
+            # Initialize danced.",
+        },
+        "answers": {
+            "A if needed
+            if 'exercise1' not in context.user_data:
+                context.user_data['exercise1'] = {"current_item": 0, "score": 0}
+            
+            current": ["4"],
+            "B_item = context.user_data['exercise1']['current_item']
+            expected_answers = PAST_SIMPLE_": ["5"],
+            "C": ["3WORKSHEET['exercise1']['answers'][current_item]
+            
+            if is_response_correct(user_input, expected_answers):
+                "],
+            "D": ["1context.user_data['exercise1']['score'] += 1
+                context.user_data"],
+            "E": ["2"]
+        }
+    }
+}
+
+#['exercise1']['current_item'] += 1
+                
+                 Navigation keyboard
+def get_navigation_keyboard(current_exercise):
+    buttons = []
+    ifif context.user_data['exercise1']['current_item']  current_exercise > 1:
+        buttons< 4:
+                    next_q = context.user_data['exercise1']['current_item']
+                    await update.append(InlineKeyboardButton("← Previous", callback_data=f".message.reply_text(
+                        f"✅ Correct! Next question: {PAST_SIMPLE_WORKSHEETnav_{current_exercise-1}"))
+    if current_exercise < 10:
+        buttons.append(In['exercise1']['questions'][next_q]}"
+                    )
+                    return EXERCISE1
+                else:
+                    score = context.user_lineKeyboardButton("Next →", callback_data=f"nav_{current_exercise+data['exercise1']['score']
+                    await update.message.1}"))
+    buttons.append(InlineKeyboardButton("Restartreply_text(
+                        f"🎉 Exercise 1 completed! Score: {score}/4",
+                        reply_markup=get_navigation_keyboard(1)
+                    )
+                    return EXERCISE1
+            else:
+                await update.message.reply_text(f"❌ Try again! Hint: {expected_answers[0]}")
+                return EXERCISE1
+                
+        elif exercise_number == 2:
+            # Handle Exercise 2 ", callback_data="nav_1"))
+    return InlineKeyboarmatching
+            if not re.match(r'^([dMarkup([buttons])
+
+#A-E]-[1-5],?\s*)+$', user_input. Start the worksheet
+asyncupper()):
+                await update.message.reply_text("Please use format: 'A-4, B-5, C-3, D-1, E-2'") def start_worksheet(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger
+                return EXERCISE2
+            
+            user_pairs = {}.info(f"Start
+            for pair in user_input.upper().split(','):
+                pair = pair.strip()
+                if command received from {update.effective '-' in pair:
+                    k, v = pair.split('-', 1)
+                    user_pairs[_user.id}")
+    context.user_data['k.strip()] = v.strip()
+            current_exercise'] = 1
+    welcome_msg = (
+        "🎓 Welcome to the
+            correct = 0
+            for k, correct_list Past Simple Worksheet Bot! 🎓\n\n"
+        "This interactive bot will help you practice past simple tense through 10 exercises.\n"
+        "You can type in PAST_SIMPLE_WORKSHEET['exercise2']['answers'].items():
+                if user_pairs.get(k) in correct_list:
+                    correct += 1
+            
+            await update.message.reply_text(
+                f"You got {correct}/5 pairs correct!",
+                reply_markup=get_navigation_keyboard(2)
+            )
+            return EXERCISE2
+        
+        else:
+            # For other exercises, just acknowledge and show navigation
+            await update.message.reply_text(
+                "✅ Thank you for your answer!",
+                reply_ your answers or send voice messages! 🎤\n\n"
+        "markup=get_navigation_keyboard(exercise_number)
+            )
+            return exercise_number
+
+    else:
+        await update.message.reply_text("Please send a text message or voice message.")
+        return exercise_number
+
+# Start a specific exercise
+async def startLet's start with Exercise 1..."
+    )
+    await update.message.reply_exercise(update: Update, context: ContextTypes.DEFAULT_TYPE, exercise_number: int):
+    _text(welcome_msg)
+    return await start_exercise(logger.info(f"Starting exercise {exercise_number}")update, context, 1)
+
+# Enhanced exercise handler
+    
+    if exercise_number == 1:
+        if 'exercise1' not in context.user_data:
+            context.user_data['exercise1'] = {"current_item": 0, "score": 0}
+        
+        current_q = context.user_ with voice support
+async def handle_exercise(updatedata['exercise1']['current_item']
+        content = (
+            f: Update, context: ContextTypes.DEFAULT_TYPE):
+    exercise_number = context.user_data.get('current_exercise', 1"📚 Exercise 1: Days and Months\n\n"
+            f"📖 Examples:\n• Today is Sunday. Yesterday)
+    
+    logger.info(f" was Saturday.\n• This month is August. Last month was July.\n\n"
+            f"📝 Complete the gaps with days ofHandling exercise {exercise_number} for user {update.effective_user.id}")
+    
+    # the week and months.\n\n"
+            f"❓ Question {current_q + 1}: {PAST_SIMPLE_WORKSHEET['exercise1']['questions'][current_q]}"
+        )
+    elif exercise_number == 2:
+        pairs = "\n".join([f"{person}: {sentence Handle voice messages
+    if update.message}" for person, sentence in PAST_SIMPLE_WORKSHEET['.voice:
+        tryexercise2']['pairs'].items()])
+        content = (
+            :
+            logger.info("Processing voice message")
+            voice_file = await update.message.f"📚 Exercise 2: Matching Activity\n\n"
+            f"📝 Match the people (A-voice.get_file()
+            voice_path = fE) with the sentences (1-5).\n\n"
+            f"👥 People"voice_{update.message.from_user.id}.ogg"
+            wav_path = f" and their activities:\n{pairs}\n\n"
+            "💬 Type your matches like: 'A-voice_{update.message.from_user.id}.wav"
+
+            await voice_file.download_to_drive(voice_path)
+            
+            if not convert_ogg_to_wav(voice_path,4, B-5, C-3, D-1, E-2'"
+        )
+    else:
+        content = f"📚 Exercise {exercise_number}\n\nThis exercise is under construction. Please use navigation buttons."
+    
+    nav_keyboard = get_navigation_keyboard(exercise_number)
+    
+    if hasattr(update, 'callback_query') and update.callback_query:
+        await wav_path):
+                await update.message.reply_text("❌ Error converting update.callback_query.edit_message_text(content, reply_markup=nav_keyboard)
+    else:
+        await update.message.reply_text(content, reply_markup=nav_keyboard)
+    
+    return globals()[f"EXERCISE{exercise_number}"]
+
+# Navigation handler
+async def navigate audio file.")
+                return exercise_number
+
+            recogn_exercises(update: Update,izer = sr.Recognizer()
+            with sr.AudioFile context: ContextTypes.DEFAULT_TYPE):
+    if hasattr(update, 'callback_query') and update.callback_query:
+        query = update.callback_query
+        await query.answer()
+        exercise_number = int((wav_path) as source:
+                audio = recognizer.record(source)
+                query.data.split('_')[1])
+        context.user_data['user_speech = recognizer.recognize_google(audio).lower()
+                awaitcurrent_exercise'] = exercise_number
+        
+        if exercise_number > 10:
+            await query.edit_message_text("🎉 Congratulations! update.message.reply_text(f"🎙 You've completed all exercises!")
+            return ConversationHandler.END
+            
+        return await start_exercise(update,️ I heard: '{user_speech}'")
+                
+                # Process as text
+                update context, exercise_number)
+    else:
+        exercise_number = context.user_data.get.message.text = user_speech
+                ('current_exercise', 1)
+        return await start_exercisereturn await handle_exercise(update, context)(update, context, exercise_number)
+
+# Error handler
+async def error_
+
+        except sr.UnknownValueErrorhandler(update, context):
+    logger.error(f"Exception:
+            await update.message.reply_text("❌ Sorry while handling an update: {context.error}")
+    logger.error(traceback.format_exc())
+
+# Debug command handler
+async def debug_command(update: Update, context: ContextTypes.DEFAULT_, I couldn't understand the audio.")
+            TYPE):
+    awaitreturn exercise_number
+        except Exception as e: update.message.reply_text(f"Debug: Bot is running! Version: {TG_VER}")
+
+# Conversation handler
+conv_handler = ConversationHandler(
+    
+            logger.error(f"Voice processing error: {e}")
+            await update.message.reply_textentry_points=[CommandHandler("start", start_worksheet)],
+    states={
+        EXERCISE1: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, handle_exercise),
+            MessageHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^nav_")
+        ],
+        EXERCISE2: [
+            MessageHandler(filters.TEXT & ~filters.("❌ Error processing voice message.")
+            return exercise_number
+        finally:
+            for path in [voice_path, wav_path]:
+                tryCOMMAND, handle_exercise),
+            MessageHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^nav_")
+        ],
+        EXERCISE3: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, handle_exercise),
+            Message:
+                    if path in locals() and os.path.existsHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^nav_")
+        ],
+        EXERCISE4: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, handle_exercise),
+            Message(path):
+                        os.remove(path)
+                except:
+                    passHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^nav_")
+        ],
+        EXERCISE
+
+    # Handle text messages
+    elif update.message.5: [
+            MessageHandler(filters.TEXT & ~filters.text:
+        user_input = update.messageCOMMAND, handle_exercise),
+            MessageHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^nav_")
+        .text.strip().lower()
+        logger],
+        EXERCISE6: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, handle_exercise),
+            MessageHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^.info(f"Processing text: {user_input}")
+        
+        ifnav_")
+        ],
+        EXERCISE7: [
+            MessageHandler(filters. exercise_number == 1:
+            #TEXT & ~filters.COMMAND, handle_exercise),
+            MessageHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^nav_")
+        ],
+        EXERCISE8: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, handle_exercise),
+            MessageHandler(filters.VOICE, handle_exercise Initialize if needed
+            if 'exercise1' not in context.user_data:
+                context.user_data['exercise1'] = {"current_item": 0, "score": 0}),
+            CallbackQueryHandler(navigate_exercises, pattern="^nav_")
+        ],
+        EXERCISE9: [
+            MessageHandler(filters.
+            
+            current_item = context.user_data['exercise1']['current_item']
+            expected_answers = PAST_SIMPLETEXT & ~filters.COMMAND, handle_exercise),
+            MessageHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^nav_")
+        ],
+        EXERCISE10: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, handle__WORKSHEET['exercise1']['answers'][current_item]
+            
+            if is_response_correct(user_inputexercise),
+            MessageHandler(filters.VOICE, handle_exercise),
+            CallbackQueryHandler(navigate_exercises, pattern="^, expected_answers):
+                contextnav_")
+        ],
+    },
+    fallbacks=[
+        CommandHandler("cancel", lambda update, context: ConversationHandler.END),
+        CommandHandler(".user_data['exercise1']['score'] += 1
+                context.user_data['exercise1']['current_item'] += 1
+                start", start_worksheet)
+    ],
+    per_message=False
+)
+
+def main():
+    # Start keep_alive for Replit
+    keep_alive()
+    
+    application = Application.builder().token(TOKEN).build()
+    application.add_handler(conv_handler)
+    application.add_
+                if context.user_data['exercise1']['current_item'] < 4:
+                    handler(CommandHandler("debug", debug_command),next_q = context group=-1)
+    application.add_error_handler(error_handler)
+    
+    logger.info("Starting bot in polling mode for.user_data['exercise1']['current_item']
+                    await update.message.reply_text( Replit")
+    application.run_polling(drop_pending_updates=True)
+
+if __name__ == "__main__":
+    main()
